@@ -1,5 +1,5 @@
 # cordova-honeywell
-Cordova Plugin to receive input from a Honeywell scanners (CT50).
+Cordova Plugin to receive input from a Honeywell scanners (CT50, D75E, others?).
 
 # Device Setup
 - No special device setup is required.
