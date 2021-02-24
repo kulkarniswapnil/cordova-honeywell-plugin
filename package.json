@@ -8,12 +8,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/icsfl/cordova-honeywell.git"
+    "url": "git+https://github.com/kulkarniswapnil/honeywell-scanner.git"
   },
-  "author": "",
+  "author": "Swapnil",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/icsfl/cordova-honeywell/issues"
+    "url": "https://github.com/kulkarniswapnil/honeywell-scanner/issues"
   },
-  "homepage": "https://github.com/icsfl/cordova-honeywell#readme"
+  "homepage": "https://github.com/kulkarniswapnil/honeywell-scanner",
+  "dependencies": {
+    "user": "0.0.0"
+  },
+  "devDependencies": {}
 }
