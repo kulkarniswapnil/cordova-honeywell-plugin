@@ -1,12 +1,14 @@
 package com.icsfl.rfsmart.honeywell;
 
 import android.content.Context;
+import android.util.Log;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.PluginResult;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -16,19 +18,20 @@ import com.honeywell.aidc.BarcodeFailureEvent;
 import com.honeywell.aidc.BarcodeReadEvent;
 import com.honeywell.aidc.BarcodeReader;
 import com.honeywell.aidc.ScannerUnavailableException;
+import com.honeywell.aidc.ScannerNotClaimedException;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class HoneywellScannerPlugin extends CordovaPlugin implements BarcodeReader.BarcodeListener {
     private static final String TAG = "HoneywellScanner";
-
     private static BarcodeReader barcodeReader;
     private AidcManager manager;
     private CallbackContext callbackContext;
 
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
+
         super.initialize(cordova, webView);
 
         Context context = cordova.getActivity().getApplicationContext();
@@ -37,8 +40,8 @@ public class HoneywellScannerPlugin extends CordovaPlugin implements BarcodeRead
             public void onCreated(AidcManager aidcManager) {
                 manager = aidcManager;
                 barcodeReader = manager.createBarcodeReader();
-                if(barcodeReader != null){
-                                  Map<String, Object> properties = new HashMap<>();
+                if (barcodeReader != null) {
+                    Map<String, Object> properties = new HashMap<>();
                     // Set Symbologies On/Off
                     properties.put(BarcodeReader.PROPERTY_CODE_128_ENABLED, true);
                     properties.put(BarcodeReader.PROPERTY_GS1_128_ENABLED, true);
@@ -81,29 +84,121 @@ public class HoneywellScannerPlugin extends CordovaPlugin implements BarcodeRead
     }
 
     @Override
-    public boolean execute(String action, final JSONArray args, final CallbackContext callbackContext) throws JSONException {
-        if(action.equals("listenForScans")){
+    public boolean execute(String action, final JSONArray args, final CallbackContext callbackContext)
+    throws JSONException {
+        if (action.equals("softwareTriggerStart")) {
+            if (barcodeReader != null) {
+                try {
+                    barcodeReader.softwareTrigger(true);
+                } catch (ScannerNotClaimedException e) {
+                    e.printStackTrace();
+                    NotifyError("ScannerNotClaimedException");
+                } catch (ScannerUnavailableException e) {
+                    e.printStackTrace();
+                 NotifyError("ScannerUnavailableException");
+                }
+            }
+        } else if (action.equals("softwareTriggerStop")) {
+            if (barcodeReader != null) {
+                try {
+                    barcodeReader.softwareTrigger(false);
+                } catch (ScannerNotClaimedException e) {
+                    e.printStackTrace();
+                    NotifyError("ScannerNotClaimedException");
+                } catch (ScannerUnavailableException e) {
+                    e.printStackTrace();
+                 NotifyError("ScannerUnavailableException");
+                }
+            }
+        } else if (action.equals("listen") ) {
             this.callbackContext = callbackContext;
             PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);
             result.setKeepCallback(true);
             this.callbackContext.sendPluginResult(result);
-        }
+            if (barcodeReader != null) {
+                try {
+                   barcodeReader.softwareTrigger(false);
+                } catch (ScannerNotClaimedException e) {
+                    e.printStackTrace();
+                    NotifyError("ScannerNotClaimedException2");
+                } catch (ScannerUnavailableException e) {
+                    e.printStackTrace();
+                     NotifyError("ScannerUnavailableException2");
+                }
+            }
+        } else if (action.equals("claim")) {
+            if (barcodeReader != null) {
+                try {
+                    barcodeReader.claim();
+                } catch (ScannerUnavailableException e) {
+                    e.printStackTrace();
+                    NotifyError("Scanner unavailable");
+                }
+            }
+            if (barcodeReader != null) {
+                try {
+                   barcodeReader.softwareTrigger(false);
+                } catch (ScannerNotClaimedException e) {
+                    e.printStackTrace();
+                    NotifyError("ScannerNotClaimedException2");
+                } catch (ScannerUnavailableException e) {
+                    e.printStackTrace();
+                     NotifyError("ScannerUnavailableException2");
+                }
+            }
+        } else if (action.equals("release")) {
+            if (barcodeReader != null) {
+                barcodeReader.release();
+            }
+            if (barcodeReader != null) {
+                try {
+                   barcodeReader.softwareTrigger(false);
+                } catch (ScannerNotClaimedException e) {
+                    e.printStackTrace();
+                    NotifyError("ScannerNotClaimedException2");
+                } catch (ScannerUnavailableException e) {
+                    e.printStackTrace();
+                     NotifyError("ScannerUnavailableException2");
+                }
+            }
+         }
         return true;
     }
 
     @Override
     public void onBarcodeEvent(BarcodeReadEvent barcodeReadEvent) {
-        if(this.callbackContext!=null)
-        {
+        if (this.callbackContext != null) {
             PluginResult result = new PluginResult(PluginResult.Status.OK, barcodeReadEvent.getBarcodeData());
             result.setKeepCallback(true);
             this.callbackContext.sendPluginResult(result);
+        }
+        if (barcodeReader != null) {
+            try {
+                barcodeReader.softwareTrigger(false);
+            } catch (ScannerNotClaimedException e) {
+                e.printStackTrace();
+                NotifyError("ScannerNotClaimedException2");
+            } catch (ScannerUnavailableException e) {
+                e.printStackTrace();
+                    NotifyError("ScannerUnavailableException2");
+            }
         }
     }
 
     @Override
     public void onFailureEvent(BarcodeFailureEvent barcodeFailureEvent) {
-        NotifyError("Scan failed");
+        NotifyError("Scan has failed");
+        if (barcodeReader != null) {
+            try {
+                barcodeReader.softwareTrigger(false);
+            } catch (ScannerNotClaimedException e) {
+                e.printStackTrace();
+                NotifyError("ScannerNotClaimedException2");
+            } catch (ScannerUnavailableException e) {
+                e.printStackTrace();
+                    NotifyError("ScannerUnavailableException2");
+            }
+        }
     }
 
     @Override
@@ -114,7 +209,18 @@ public class HoneywellScannerPlugin extends CordovaPlugin implements BarcodeRead
                 barcodeReader.claim();
             } catch (ScannerUnavailableException e) {
                 e.printStackTrace();
-                NotifyError("Scanner unavailable");
+                NotifyError("The scanner is unavailable");
+            }
+        }
+        if (barcodeReader != null) {
+            try {
+                barcodeReader.softwareTrigger(false);
+            } catch (ScannerNotClaimedException e) {
+                e.printStackTrace();
+                NotifyError("ScannerNotClaimedException2");
+            } catch (ScannerUnavailableException e) {
+                e.printStackTrace();
+                    NotifyError("ScannerUnavailableException2");
             }
         }
     }
@@ -123,9 +229,18 @@ public class HoneywellScannerPlugin extends CordovaPlugin implements BarcodeRead
     public void onPause(boolean multitasking) {
         super.onPause(multitasking);
         if (barcodeReader != null) {
-            // release the scanner claim so we don't get any scanner
-            // notifications while paused.
             barcodeReader.release();
+        }
+        if (barcodeReader != null) {
+            try {
+                barcodeReader.softwareTrigger(false);
+            } catch (ScannerNotClaimedException e) {
+                e.printStackTrace();
+                NotifyError("ScannerNotClaimedException2");
+            } catch (ScannerUnavailableException e) {
+                e.printStackTrace();
+                    NotifyError("ScannerUnavailableException2");
+            }
         }
     }
 
@@ -134,21 +249,17 @@ public class HoneywellScannerPlugin extends CordovaPlugin implements BarcodeRead
         super.onDestroy();
 
         if (barcodeReader != null) {
-            // close BarcodeReader to clean up resources.
             barcodeReader.close();
             barcodeReader = null;
         }
 
         if (manager != null) {
-            // close AidcManager to disconnect from the scanner service.
-            // once closed, the object can no longer be used.
             manager.close();
         }
     }
 
-    private void NotifyError(String error){
-        if(this.callbackContext!=null)
-        {
+    private void NotifyError(String error) {
+        if (this.callbackContext != null) {
             PluginResult result = new PluginResult(PluginResult.Status.ERROR, error);
             result.setKeepCallback(true);
             this.callbackContext.sendPluginResult(result);

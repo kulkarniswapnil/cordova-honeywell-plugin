@@ -1,3 +1,11 @@
+# Original plugin 
+https://www.npmjs.com/package/cordova-honeywell-scanner-simplified
+
+I have just copied all the code from above source and added extra properties as per my need. Original plugin was not ale to scan EAN-13 and some more. I enabled almost everyting.
+
+So all credit goes to the original one. 
+
+
 # cordova-honeywell
 Cordova Plugin to receive input from a Honeywell scanners (CT50, D75E, others?).
 
