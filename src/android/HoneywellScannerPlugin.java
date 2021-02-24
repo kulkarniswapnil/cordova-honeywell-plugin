@@ -17,6 +17,9 @@ import com.honeywell.aidc.BarcodeReadEvent;
 import com.honeywell.aidc.BarcodeReader;
 import com.honeywell.aidc.ScannerUnavailableException;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class HoneywellScannerPlugin extends CordovaPlugin implements BarcodeReader.BarcodeListener {
     private static final String TAG = "HoneywellScanner";
 
@@ -35,7 +38,7 @@ public class HoneywellScannerPlugin extends CordovaPlugin implements BarcodeRead
                 manager = aidcManager;
                 barcodeReader = manager.createBarcodeReader();
                 if(barcodeReader != null){
-                                  Map<String, Object> properties = new HashMap<String, Object>();
+                                  Map<String, Object> properties = new HashMap<>();
                     // Set Symbologies On/Off
                     properties.put(BarcodeReader.PROPERTY_CODE_128_ENABLED, true);
                     properties.put(BarcodeReader.PROPERTY_GS1_128_ENABLED, true);
