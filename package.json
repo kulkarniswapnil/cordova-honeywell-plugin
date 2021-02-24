@@ -1,6 +1,6 @@
 {
   "name": "cordova-honeywell-plugin",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Cordova Plugin to receive scanned code from a Honeywell scanner (CT50, CT60, D75E, others?).",
   "main": "index.js",
   "scripts": {
