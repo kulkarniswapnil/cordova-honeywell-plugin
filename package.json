@@ -1,7 +1,7 @@
 {
-  "name": "cordova-honeywell",
+  "name": "cordova-honeywell-plugin",
   "version": "1.0.0",
-  "description": "Cordova Plugin to receive input from a Honeywell scanners (CT50, D75E, others?).",
+  "description": "Cordova Plugin to receive scanned code from a Honeywell scanner (CT50, CT60, D75E, others?).",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
